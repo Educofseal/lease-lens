@@ -1,0 +1,11 @@
+{
+  "id": 4,
+  "locador": "Gabriela Nunes",
+  "locatario": "Isabela Cruz",
+  "endereco": "Rua das Palmeiras, 812 - Rio de Janeiro/RJ",
+  "aluguel": 1500,
+  "vigencia_inicio": "07/2025",
+  "vigencia_fim": "01/2028",
+  "indice_reajuste": "IPCA",
+  "caucao": 4500
+}

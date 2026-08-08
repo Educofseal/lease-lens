@@ -1,0 +1,11 @@
+{
+  "id": 5,
+  "locador": "Felipe Costa",
+  "locatario": "Joao Pereira",
+  "endereco": "Av. Paulista, 216 - Sao Paulo/SP",
+  "aluguel": 2200,
+  "vigencia_inicio": "10/2024",
+  "vigencia_fim": "04/2027",
+  "indice_reajuste": "IPCA",
+  "caucao": 6600
+}

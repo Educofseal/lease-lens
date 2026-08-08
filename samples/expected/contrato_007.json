@@ -1,0 +1,11 @@
+{
+  "id": 7,
+  "locador": "Diego Alves",
+  "locatario": "Carla Dias",
+  "endereco": "Rua das Palmeiras, 1538 - Suzano/SP",
+  "aluguel": 1500,
+  "vigencia_inicio": "10/2026",
+  "vigencia_fim": "10/2028",
+  "indice_reajuste": "IGP-M",
+  "caucao": 3000
+}

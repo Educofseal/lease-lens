@@ -1,0 +1,11 @@
+{
+  "id": 1,
+  "locador": "Bruno Lima",
+  "locatario": "Felipe Costa",
+  "endereco": "Rua Ipe Amarelo, 1442 - Sao Paulo/SP",
+  "aluguel": 1500,
+  "vigencia_inicio": "09/2024",
+  "vigencia_fim": "03/2027",
+  "indice_reajuste": "INPC",
+  "caucao": 3000
+}

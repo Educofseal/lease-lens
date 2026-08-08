@@ -1,0 +1,11 @@
+{
+  "id": 2,
+  "locador": "Diego Alves",
+  "locatario": "Isabela Cruz",
+  "endereco": "Rua do Sol, 1340 - Belo Horizonte/MG",
+  "aluguel": 1800,
+  "vigencia_inicio": "05/2025",
+  "vigencia_fim": "05/2028",
+  "indice_reajuste": "INPC",
+  "caucao": 3600
+}
