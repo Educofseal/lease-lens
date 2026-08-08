@@ -1,11 +1,11 @@
 {
   "id": 7,
-  "locador": "Diego Alves",
+  "locador": "Henrique Melo",
   "locatario": "Carla Dias",
-  "endereco": "Rua das Palmeiras, 1538 - Suzano/SP",
-  "aluguel": 1500,
-  "vigencia_inicio": "10/2026",
-  "vigencia_fim": "10/2028",
-  "indice_reajuste": "IGP-M",
-  "caucao": 3000
+  "endereco": "Rua do Sol, 846 - Sao Paulo/SP",
+  "aluguel": 3500,
+  "vigencia_inicio": "08/2027",
+  "vigencia_fim": "08/2028",
+  "indice_reajuste": "IPCA",
+  "caucao": 10500
 }

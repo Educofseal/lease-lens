@@ -1,11 +1,11 @@
 {
   "id": 3,
-  "locador": "Elena Rocha",
-  "locatario": "Henrique Melo",
-  "endereco": "Av. Brasil, 715 - Rio de Janeiro/RJ",
-  "aluguel": 1500,
-  "vigencia_inicio": "06/2025",
-  "vigencia_fim": "12/2027",
-  "indice_reajuste": "IPCA",
-  "caucao": 4500
+  "locador": "Felipe Costa",
+  "locatario": "Carla Dias",
+  "endereco": "Rua das Palmeiras, 1631 - Rio de Janeiro/RJ",
+  "aluguel": 3500,
+  "vigencia_inicio": "11/2025",
+  "vigencia_fim": "05/2028",
+  "indice_reajuste": "INPC",
+  "caucao": 3500
 }

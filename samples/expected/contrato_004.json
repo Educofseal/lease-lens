@@ -1,11 +1,11 @@
 {
   "id": 4,
-  "locador": "Gabriela Nunes",
+  "locador": "Diego Alves",
   "locatario": "Isabela Cruz",
-  "endereco": "Rua das Palmeiras, 812 - Rio de Janeiro/RJ",
-  "aluguel": 1500,
-  "vigencia_inicio": "07/2025",
-  "vigencia_fim": "01/2028",
-  "indice_reajuste": "IPCA",
-  "caucao": 4500
+  "endereco": "Rua Ipe Amarelo, 303 - Curitiba/PR",
+  "aluguel": 1800,
+  "vigencia_inicio": "08/2027",
+  "vigencia_fim": "08/2030",
+  "indice_reajuste": "IGP-M",
+  "caucao": 1800
 }

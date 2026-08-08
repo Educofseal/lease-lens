@@ -1,6 +1,7 @@
 """Gerador de contratos de locacao SINTETICOS (ficticios)."""
 import json
 import random
+from datetime import datetime
 from pathlib import Path
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm
@@ -20,7 +21,7 @@ CIDADES = ["Sao Paulo/SP", "Suzano/SP", "Rio de Janeiro/RJ",
 INDICES = ["IGP-M", "IPCA", "INPC"]
 
 
-def gerar_contrato(num):
+def gerar_contrato(num, vence_logo=False):
     locador = random.choice(NOMES)
     locatario = random.choice([n for n in NOMES if n != locador])
     rua = random.choice(RUAS)
@@ -28,12 +29,22 @@ def gerar_contrato(num):
     cidade = random.choice(CIDADES)
     endereco = rua + ", " + str(numero) + " - " + cidade
     aluguel = random.choice([1200, 1500, 1800, 2200, 2500, 3000, 3500])
-    meses = random.choice([12, 24, 30, 36])
-    ano = random.choice([2024, 2025, 2026])
-    mes = random.randint(1, 12)
-    inicio = f"{mes:02d}/{ano}"
-    total = (ano * 12 + (mes - 1)) + meses
-    fim = f"{(total % 12) + 1:02d}/{total // 12}"
+
+    if vence_logo:
+        # forca o termino dentro dos proximos ~90 dias (pra demo)
+        hoje = datetime.today()
+        mes_fim = ((hoje.month - 1 + random.choice([1, 2, 3])) % 12) + 1
+        ano_fim = hoje.year + (1 if hoje.month + 2 > 12 else 0)
+        fim = f"{mes_fim:02d}/{ano_fim}"
+        # inicio: uns 2 anos antes do fim
+        inicio = f"{mes_fim:02d}/{ano_fim - 2}"
+    else:
+        meses = random.choice([12, 24, 30, 36])
+        ano = random.choice([2025, 2026, 2027])
+        mes = random.randint(1, 12)
+        inicio = f"{mes:02d}/{ano}"
+        total = (ano * 12 + (mes - 1)) + meses
+        fim = f"{(total % 12) + 1:02d}/{total // 12}"
     indice = random.choice(INDICES)
     caucao = aluguel * random.choice([1, 2, 3])
     return {
@@ -75,7 +86,7 @@ def main(quantidade=8):
     CONTRACTS.mkdir(parents=True, exist_ok=True)
     EXPECTED.mkdir(parents=True, exist_ok=True)
     for i in range(1, quantidade + 1):
-        dados = gerar_contrato(i)
+        dados = gerar_contrato(i, vence_logo=(i <= 2))
         nome = f"contrato_{i:03d}"
         escrever_pdf(dados, CONTRACTS / (nome + ".pdf"))
         texto = json.dumps(dados, indent=2, ensure_ascii=False)

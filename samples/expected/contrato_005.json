@@ -1,11 +1,11 @@
 {
   "id": 5,
-  "locador": "Felipe Costa",
-  "locatario": "Joao Pereira",
-  "endereco": "Av. Paulista, 216 - Sao Paulo/SP",
-  "aluguel": 2200,
-  "vigencia_inicio": "10/2024",
-  "vigencia_fim": "04/2027",
+  "locador": "Carla Dias",
+  "locatario": "Isabela Cruz",
+  "endereco": "Rua das Palmeiras, 450 - Belo Horizonte/MG",
+  "aluguel": 1200,
+  "vigencia_inicio": "04/2026",
+  "vigencia_fim": "10/2028",
   "indice_reajuste": "IPCA",
-  "caucao": 6600
+  "caucao": 2400
 }

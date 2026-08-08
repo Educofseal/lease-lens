@@ -1,11 +1,11 @@
 {
   "id": 8,
-  "locador": "Joao Pereira",
+  "locador": "Carla Dias",
   "locatario": "Isabela Cruz",
-  "endereco": "Rua XV de Novembro, 1467 - Belo Horizonte/MG",
-  "aluguel": 2200,
-  "vigencia_inicio": "01/2024",
-  "vigencia_fim": "01/2027",
-  "indice_reajuste": "IGP-M",
-  "caucao": 6600
+  "endereco": "Rua Ipe Amarelo, 25 - Suzano/SP",
+  "aluguel": 3500,
+  "vigencia_inicio": "11/2025",
+  "vigencia_fim": "11/2026",
+  "indice_reajuste": "IPCA",
+  "caucao": 7000
 }
