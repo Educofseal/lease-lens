@@ -18,6 +18,9 @@ def extrair_campos(texto):
     campos["locador"] = _buscar(r"instrumento,\s*(.+?),\s*LOCADOR", texto)
     campos["locatario"] = _buscar(r"e\s*(.+?),\s*LOCATARIO", texto)
     campos["endereco"] = _buscar(r"IMOVEL:\s*(.+)", texto)
+    if campos["endereco"]:
+        # a frase do contrato termina em ponto, que nao faz parte do endereco
+        campos["endereco"] = campos["endereco"].rstrip(".")
     campos["aluguel"] = _buscar(r"ALUGUEL:\s*R\$\s*([\d.]+)", texto)
     campos["vigencia_inicio"] = _buscar(r"VIGENCIA:\s*de\s*([\d/]+)", texto)
     campos["vigencia_fim"] = _buscar(r"a\s*([\d/]+)\.", texto)

@@ -4,6 +4,8 @@
 
 `Python` · `pdfplumber` · `SQLite` · `Streamlit` · `regex`
 
+![Painel da carteira no lease-lens](docs/lease-lens.png)
+
 ---
 
 ## O que me fez construir
@@ -29,6 +31,9 @@ Cada camada é isolada e testável sozinha — a extração não sabe que existe
 ## O desafio que me prendeu
 Um regex de endereço parava no primeiro ponto e truncava "Av." silenciosamente — a extração marcava 100% de confiança com o dado **errado**. Isso me ensinou que "achou algo" não é "achou certo", e que score de confiança precisa evoluir pra validar conteúdo, não só presença.
 
+## Precisão medida
+`src/avaliar.py` compara cada campo extraído com o gabarito dos contratos sintéticos. Resultado atual: **56 de 56 campos corretos (100%)** nos 8 contratos. A primeira medição deu 48/56: todo endereço vinha com o ponto final da frase do contrato, e o score de confiança marcava 100% mesmo assim. Foi a medição contra o gabarito que pegou o erro.
+
 ## O que aprendi
 Extração de PDF na prática, regex para dados estruturados, modelagem em SQLite, SQL analítico, e arquitetura em camadas que separa domínio de interface.
 
@@ -41,11 +46,15 @@ Feito para contratos sintéticos bem-formados. Contratos reais escaneados exigir
 ```bash
 python -m venv .venv
 .venv\Scripts\activate        # Windows
+# source .venv/bin/activate   # Linux/Mac
 pip install -r requirements.txt
 
 python tools/make_samples.py  # gera contratos sintéticos
 python src/pipeline.py        # extrai e salva no banco
 streamlit run app.py          # abre a interface
+
+python src/avaliar.py         # mede a precisão contra o gabarito
+pip install pytest && python -m pytest   # roda os testes
 ```
 
 ## Licença
