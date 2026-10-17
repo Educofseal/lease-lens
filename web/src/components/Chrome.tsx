@@ -6,6 +6,7 @@ import { useRef, useState } from 'react'
 import type { Carteira } from '../lib/api'
 import { dataCurta } from '../lib/format'
 import { MQ, ScrollTrigger, gsap, irPara, prefereMenosMovimento, useGSAP } from '../lib/motion'
+import { noStreamlit } from '../lib/streamlit'
 
 const SECOES = [
   ['resposta', 'Resposta'],
@@ -143,12 +144,16 @@ export function TelaErro({ mensagem, tentar }: { mensagem: string; tentar: () =>
   return (
     <main id="conteudo" className="error-screen">
       <Marca />
-      <h1>A API não respondeu.</h1>
+      <h1>{noStreamlit ? 'Não consegui carregar a carteira.' : 'A API não respondeu.'}</h1>
       <p className="muted">{mensagem}</p>
-      <p>Suba o backend na raiz do projeto e tente de novo:</p>
-      <pre className="mono">
-        <code>.venv\Scripts\python -m uvicorn api:app --port 8000</code>
-      </pre>
+      {!noStreamlit && (
+        <>
+          <p>Suba o backend na raiz do projeto e tente de novo:</p>
+          <pre className="mono">
+            <code>.venv\Scripts\python -m uvicorn api:app --port 8000</code>
+          </pre>
+        </>
+      )}
       <button type="button" className="btn btn-primary" onClick={tentar}>
         Tentar de novo
       </button>
@@ -170,7 +175,15 @@ export function Rodape() {
           ))}
         </ul>
         <p className="footer-links">
-          <a href="/api/docs">Documentação da API</a>
+          <a href="https://github.com/Educofseal/lease-lens" target="_blank" rel="noreferrer">
+            Código no GitHub
+          </a>
+          {!noStreamlit && (
+            <>
+              <span className="muted"> · </span>
+              <a href="/api/docs">Documentação da API</a>
+            </>
+          )}
           <span className="muted"> · MIT</span>
         </p>
       </div>

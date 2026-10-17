@@ -9,6 +9,9 @@ import './styles/tokens.css'
 import './styles/base.css'
 import './styles/sections.css'
 import { App } from './App'
+import { iniciarStreamlit } from './lib/streamlit'
+
+iniciarStreamlit()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

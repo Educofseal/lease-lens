@@ -25,7 +25,7 @@ Cada camada é isolada e testável sozinha — a extração não sabe que existe
 PDF ─► extract.py ─► fields.py ─► store.py (SQLite) ─► query.py ─► api.py (FastAPI) ─► web/ (React)
 ```
 
-A interface web (`web/`, React + Vite + GSAP) só conversa com a API (`api.py`), que só chama as funções de consulta. A versão Streamlit (`app.py`) continua funcionando como alternativa enxuta.
+A interface web (`web/`, React + Vite + GSAP) só conversa com a camada de consulta, por um de dois caminhos: a API (`api.py`, FastAPI) ou o app Streamlit (`app.py`). No Streamlit, que é a versão publicada em **[lease-lens.streamlit.app](https://lease-lens.streamlit.app)**, o mesmo frontend roda como componente: os dados da carteira chegam como argumento, e o PDF enviado volta para o Python, que faz a extração. Se o build (`web/build`) não existir, o `app.py` cai na interface Streamlit clássica.
 
 A página conta a resposta como uma história de scroll: a pilha de contratos da carteira, a lente que lê a data de fim e a resposta nascendo de dentro dela. Depois vêm a linha do tempo de cada contrato, os números da carteira, os índices de reajuste, a saúde da extração e um laboratório para testar um PDF ao vivo. Respeita `prefers-reduced-motion` (sem pins, parallax nem loops) e funciona no celular.
 
@@ -67,10 +67,16 @@ cd web && npm install && npm run build && cd ..
 uvicorn api:app --port 8000            # abre em http://localhost:8000
 ```
 
-A documentação da API fica em `/api/docs`. A interface Streamlit antiga continua disponível com `streamlit run app.py`.
+A documentação da API fica em `/api/docs`.
+
+**Versão Streamlit** (a mesma do site publicado):
+```bash
+streamlit run app.py
+```
 
 ## Deploy
-O `Dockerfile` compila o frontend e sobe a API servindo tudo numa porta só (usa o `requirements-api.txt`, mais enxuto). O `render.yaml` descreve um web service gratuito no [Render](https://render.com): em *New → Blueprint*, aponte para este repositório e cada push na `main` vira um deploy novo.
+- **Streamlit Community Cloud** (em uso): o app publica o `app.py` direto da `main`. Como o Streamlit Cloud não roda `npm`, o build do componente fica versionado em `web/build`. Depois de mexer no frontend, rode `npm run build:streamlit` dentro de `web/` e commite o resultado.
+- **Docker / Render** (alternativa): o `Dockerfile` compila o frontend e sobe a API servindo tudo numa porta só (usa o `requirements-api.txt`, mais enxuto). O `render.yaml` descreve um web service gratuito no [Render](https://render.com): em *New → Blueprint*, aponte para este repositório.
 
 ## Licença
 MIT

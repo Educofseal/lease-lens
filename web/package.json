@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -p . && vite build",
+    "build:streamlit": "tsc -p . && vite build --outDir build --emptyOutDir",
     "preview": "vite preview"
   },
   "dependencies": {

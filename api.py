@@ -1,7 +1,6 @@
 """API HTTP do lease-lens (FastAPI). O frontend em web/ so conversa com ela."""
 import sys
 from contextlib import closing
-from datetime import date
 from pathlib import Path
 
 # deixa o Python enxergar a pasta src/
@@ -14,7 +13,7 @@ from fastapi.staticfiles import StaticFiles
 from extract import extrair_texto
 from fields import extrair_campos
 from store import conectar
-from query import carteira, vencendo_em, resumo_carteira, com_problema
+from query import painel
 
 CONTRACTS = BASE / "samples" / "contracts"
 DIST = BASE / "web" / "dist"
@@ -27,31 +26,7 @@ app = FastAPI(title="lease-lens", docs_url="/api/docs", openapi_url="/api/openap
 def visao_carteira(dias: int = 90):
     """Tudo que o painel precisa numa chamada so."""
     with closing(conectar()) as con:
-        resumo = resumo_carteira(con)
-        contratos = carteira(con)
-        vencendo = vencendo_em(con, dias)
-        problemas = com_problema(con)
-
-    alugueis = [c["aluguel"] for c in contratos if c["aluguel"] is not None]
-    confiancas = [c["confianca"] for c in contratos if c["confianca"] is not None]
-    return {
-        "hoje": date.today().isoformat(),
-        "janela_dias": dias,
-        "total": resumo["total"],
-        "aluguel_medio": resumo["aluguel_medio"],
-        "receita_mensal": sum(alugueis),
-        "confianca_media": sum(confiancas) / len(confiancas) if confiancas else None,
-        "por_indice": [
-            {"indice": i, "contratos": q, "aluguel_medio": m}
-            for i, q, m in resumo["por_indice"]
-        ],
-        "vencendo": [
-            {"arquivo": a, "locatario": loc, "vigencia_fim": f, "dias_restantes": d}
-            for a, loc, f, d in vencendo
-        ],
-        "problemas": [{"arquivo": a, "confianca": c} for a, c in problemas],
-        "contratos": contratos,
-    }
+        return painel(con, dias)
 
 
 @app.get("/api/exemplos")

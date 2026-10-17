@@ -1,5 +1,5 @@
 """Camada de consulta: perguntas operacionais sobre a carteira."""
-from datetime import datetime
+from datetime import date, datetime
 from store import conectar
 
 
@@ -63,6 +63,32 @@ def com_problema(con, limite=1.0):
         WHERE confianca < ?
         ORDER BY confianca ASC
     """, (limite,)).fetchall()
+
+
+def painel(con, dias=90):
+    """Tudo que a interface web precisa numa chamada so (API e Streamlit)."""
+    resumo = resumo_carteira(con)
+    contratos = carteira(con)
+    alugueis = [c["aluguel"] for c in contratos if c["aluguel"] is not None]
+    confiancas = [c["confianca"] for c in contratos if c["confianca"] is not None]
+    return {
+        "hoje": date.today().isoformat(),
+        "janela_dias": dias,
+        "total": resumo["total"],
+        "aluguel_medio": resumo["aluguel_medio"],
+        "receita_mensal": sum(alugueis),
+        "confianca_media": sum(confiancas) / len(confiancas) if confiancas else None,
+        "por_indice": [
+            {"indice": i, "contratos": q, "aluguel_medio": m}
+            for i, q, m in resumo["por_indice"]
+        ],
+        "vencendo": [
+            {"arquivo": a, "locatario": loc, "vigencia_fim": f, "dias_restantes": d}
+            for a, loc, f, d in vencendo_em(con, dias)
+        ],
+        "problemas": [{"arquivo": a, "confianca": c} for a, c in com_problema(con)],
+        "contratos": contratos,
+    }
 
 
 if __name__ == "__main__":

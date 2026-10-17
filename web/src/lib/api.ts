@@ -1,4 +1,6 @@
 // Cliente da API FastAPI (api.py). Tipos espelham o JSON que ela devolve.
+// Dentro do Streamlit (app.py) os mesmos dados vêm pela ponte em streamlit.ts.
+import { argsDoStreamlit, noStreamlit, pedirExtracao } from './streamlit'
 
 export type Contrato = {
   arquivo: string
@@ -64,14 +66,31 @@ async function pedir<T>(url: string, init?: RequestInit): Promise<T> {
   return resposta.json() as Promise<T>
 }
 
-export const buscarCarteira = () => pedir<Carteira>('/api/carteira')
+const LIMITE_UPLOAD = 10 * 1024 * 1024
 
-export const listarExemplos = () => pedir<string[]>('/api/exemplos')
+export const buscarCarteira = () =>
+  noStreamlit ? argsDoStreamlit().then((a) => a.carteira!) : pedir<Carteira>('/api/carteira')
+
+export const listarExemplos = () =>
+  noStreamlit ? argsDoStreamlit().then((a) => a.exemplos ?? []) : pedir<string[]>('/api/exemplos')
 
 export const extrairExemplo = (arquivo: string) =>
-  pedir<Extracao>(`/api/exemplos/${encodeURIComponent(arquivo)}/extrair`, { method: 'POST' })
+  noStreamlit
+    ? pedirExtracao({ tipo: 'exemplo', arquivo })
+    : pedir<Extracao>(`/api/exemplos/${encodeURIComponent(arquivo)}/extrair`, { method: 'POST' })
 
-export function extrairPdf(arquivo: File) {
+function emBase64(arquivo: File) {
+  return new Promise<string>((ok, falha) => {
+    const leitor = new FileReader()
+    leitor.onload = () => ok(String(leitor.result).split(',')[1] ?? '')
+    leitor.onerror = () => falha(new Error('Não consegui ler o arquivo.'))
+    leitor.readAsDataURL(arquivo)
+  })
+}
+
+export async function extrairPdf(arquivo: File) {
+  if (arquivo.size > LIMITE_UPLOAD) throw new Error('O PDF passa de 10 MB.')
+  if (noStreamlit) return pedirExtracao({ tipo: 'upload', arquivo: arquivo.name, b64: await emBase64(arquivo) })
   const corpo = new FormData()
   corpo.append('arquivo', arquivo)
   return pedir<Extracao>('/api/extrair', { method: 'POST', body: corpo })
