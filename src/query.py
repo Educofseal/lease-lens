@@ -3,23 +3,44 @@ from datetime import datetime
 from store import conectar
 
 
+def _dias_ate(fim):
+    """Dias entre hoje e o inicio do mes 'MM/AAAA'. None se a data for invalida."""
+    if not fim:
+        return None
+    try:
+        mes, ano = fim.split("/")
+        data_fim = datetime(int(ano), int(mes), 1)
+    except (ValueError, AttributeError):
+        return None
+    return (data_fim - datetime.today()).days
+
+
 def vencendo_em(con, dias=90):
     """Contratos cuja vigencia_fim cai nos proximos N dias."""
-    hoje = datetime.today()
     resultado = []
     for row in con.execute("SELECT arquivo, locatario, vigencia_fim FROM contratos"):
         arquivo, locatario, fim = row
-        if not fim:
-            continue
-        try:
-            mes, ano = fim.split("/")
-            data_fim = datetime(int(ano), int(mes), 1)
-        except (ValueError, AttributeError):
-            continue
-        faltam = (data_fim - hoje).days
-        if 0 <= faltam <= dias:
+        faltam = _dias_ate(fim)
+        if faltam is not None and 0 <= faltam <= dias:
             resultado.append((arquivo, locatario, fim, faltam))
     return sorted(resultado, key=lambda x: x[3])
+
+
+def carteira(con):
+    """Todos os contratos, com os dias que faltam pro fim (negativo = ja venceu)."""
+    cur = con.execute("""
+        SELECT arquivo, locador, locatario, endereco, aluguel,
+               vigencia_inicio, vigencia_fim, indice_reajuste, confianca
+        FROM contratos
+        ORDER BY arquivo
+    """)
+    colunas = [c[0] for c in cur.description]
+    contratos = []
+    for row in cur.fetchall():
+        contrato = dict(zip(colunas, row))
+        contrato["dias_restantes"] = _dias_ate(contrato["vigencia_fim"])
+        contratos.append(contrato)
+    return contratos
 
 
 def resumo_carteira(con):
