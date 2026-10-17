@@ -2,7 +2,7 @@
 
 > Passei um tempo cercado de contratos de locação numa operação imobiliária. A pergunta que mais se repetia era simples de fazer e chata de responder: "quais vencem esse trimestre?". Construí o lease-lens pra responder esse tipo de pergunta sozinho.
 
-`Python` · `pdfplumber` · `SQLite` · `Streamlit` · `regex`
+`Python` · `pdfplumber` · `SQLite` · `regex` · `FastAPI` · `React` · `GSAP`
 
 ---
 
@@ -19,7 +19,15 @@ E deixa testar um contrato avulso: sobe o PDF, vê os campos extraídos na hora.
 
 ## Como funciona (pipeline em camadas)
 
-Cada camada é isolada e testável sozinha — a extração não sabe que existe UI, a consulta não sabe que veio de PDF. A interface (Streamlit) só chama as funções de consulta.
+Cada camada é isolada e testável sozinha — a extração não sabe que existe UI, a consulta não sabe que veio de PDF.
+
+```
+PDF ─► extract.py ─► fields.py ─► store.py (SQLite) ─► query.py ─► api.py (FastAPI) ─► web/ (React)
+```
+
+A interface web (`web/`, React + Vite + GSAP) só conversa com a API (`api.py`), que só chama as funções de consulta. A versão Streamlit (`app.py`) continua funcionando como alternativa enxuta.
+
+A página conta a resposta como uma história de scroll: a pilha de contratos da carteira, a lente que lê a data de fim e a resposta nascendo de dentro dela. Depois vêm a linha do tempo de cada contrato, os números da carteira, os índices de reajuste, a saúde da extração e um laboratório para testar um PDF ao vivo. Respeita `prefers-reduced-motion` (sem pins, parallax nem loops) e funciona no celular.
 
 ## Decisões de design
 - **Dados sintéticos por design**: um gerador (`tools/make_samples.py`) cria contratos fictícios + um gabarito JSON. Nenhum dado real de ninguém — e qualquer pessoa clona o repo e reproduz tudo.
@@ -45,8 +53,21 @@ pip install -r requirements.txt
 
 python tools/make_samples.py  # gera contratos sintéticos
 python src/pipeline.py        # extrai e salva no banco
-streamlit run app.py          # abre a interface
 ```
+
+**Interface web (desenvolvimento)**: dois terminais, com Node 20+:
+```bash
+uvicorn api:app --port 8000 --reload   # API
+cd web && npm install && npm run dev   # frontend em http://localhost:5173
+```
+
+**Interface web (produção)**: a própria API serve o frontend compilado:
+```bash
+cd web && npm install && npm run build && cd ..
+uvicorn api:app --port 8000            # abre em http://localhost:8000
+```
+
+A documentação da API fica em `/api/docs`. A interface Streamlit antiga continua disponível com `streamlit run app.py`.
 
 ## Licença
 MIT
