@@ -1,0 +1,48 @@
+/* Tokens do lease-lens: tinta escura, papel de contrato e a luz âmbar da lente. */
+:root {
+  color-scheme: dark;
+
+  /* superfícies */
+  --ink-0: #07080c;
+  --ink-1: #0c0e14;
+  --ink-2: #13161f;
+  --ink-3: #1b1f2a;
+  --line: rgba(236, 232, 225, 0.09);
+  --line-strong: rgba(236, 232, 225, 0.2);
+
+  /* texto */
+  --text: #ece8e1;
+  --text-soft: #c9c6c0;
+  --muted: #9a9ca6;
+
+  /* papel dos contratos */
+  --paper: #f2ebdd;
+  --paper-ink: #2a2620;
+  --paper-line: rgba(42, 38, 32, 0.15);
+
+  /* acentos */
+  --amber: #ffb547;
+  --coral: #ff6b57;
+  --teal: #5ee6c1;
+
+  /* índices de reajuste */
+  --idx-ipca: #5ee6c1;
+  --idx-inpc: #a99bff;
+  --idx-igpm: #7cc4ff;
+
+  /* tipografia */
+  --font-display: 'Fraunces Variable', 'Iowan Old Style', Georgia, serif;
+  --font-body: 'Manrope Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, 'Cascadia Mono', monospace;
+
+  /* layout */
+  --gutter: clamp(16px, 4vw, 40px);
+  --max: 1240px;
+  --radius: 28px;
+  --nav-h: 76px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* sistema de profundidade (epic-design) */
+  --depth-0-blur: 8px;
+  --depth-1-blur: 4px;
+}
