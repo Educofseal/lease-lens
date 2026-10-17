@@ -6,6 +6,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { CAMPOS, extrairExemplo, extrairPdf, listarExemplos, type Extracao } from '../lib/api'
 import { moeda, pct, semPdf } from '../lib/format'
+import { modo } from '../lib/modo'
 import { MQ, embaralhar, gsap, prefereMenosMovimento, useGSAP } from '../lib/motion'
 
 type Estado =
@@ -169,6 +170,9 @@ export function LiveTest() {
               </svg>
               <strong>Arraste um PDF para cá</strong>
               <span className="muted">ou clique para escolher · até 10 MB</span>
+              {modo === 'estatico' && (
+                <span className="mono muted drop-privacy">lido aqui no navegador: o PDF não sai do seu computador</span>
+              )}
             </label>
 
             {exemplos.length > 0 && (

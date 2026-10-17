@@ -25,7 +25,14 @@ Cada camada é isolada e testável sozinha — a extração não sabe que existe
 PDF ─► extract.py ─► fields.py ─► store.py (SQLite) ─► query.py ─► api.py (FastAPI) ─► web/ (React)
 ```
 
-A interface web (`web/`, React + Vite + GSAP) só conversa com a camada de consulta, por um de dois caminhos: a API (`api.py`, FastAPI) ou o app Streamlit (`app.py`). No Streamlit, que é a versão publicada em **[lease-lens.streamlit.app](https://lease-lens.streamlit.app)**, o mesmo frontend roda como componente: os dados da carteira chegam como argumento, e o PDF enviado volta para o Python, que faz a extração. Se o build (`web/build`) não existir, o `app.py` cai na interface Streamlit clássica.
+**Ao vivo: [educofseal.github.io/lease-lens](https://educofseal.github.io/lease-lens/)**
+
+A interface web (`web/`, React + Vite + GSAP) é a mesma em três lugares:
+- **GitHub Pages (site publicado):** estático e sempre no ar. A cada push, um GitHub Action roda o pipeline Python e exporta a carteira para JSON. As contas de vencimento rodam no navegador, na data de quem visita. O PDF enviado no laboratório é lido no próprio navegador ([pdf.js](https://mozilla.github.io/pdf.js/) + `web/src/lib/campos.ts`, espelho dos regex do `fields.py`) e não sai do computador.
+- **API (`api.py`, FastAPI):** a extração roda no Python do servidor.
+- **Streamlit (`app.py`, [lease-lens.streamlit.app](https://lease-lens.streamlit.app)):** o frontend roda como componente e o PDF volta para o Python. Sem o build em `web/build`, cai na interface Streamlit clássica.
+
+Como a extração existe em duas linguagens, o CI confere as duas contra o mesmo gabarito (`samples/expected`) antes de publicar: `tools/checar_gabarito.py` (Python) e `web/scripts/gabarito.ts` (navegador). Se uma divergir, o deploy não acontece.
 
 A página conta a resposta como uma história de scroll: a pilha de contratos da carteira, a lente que lê a data de fim e a resposta nascendo de dentro dela. Depois vêm a linha do tempo de cada contrato, os números da carteira, os índices de reajuste, a saúde da extração e um laboratório para testar um PDF ao vivo. Respeita `prefers-reduced-motion` (sem pins, parallax nem loops) e funciona no celular.
 
@@ -74,9 +81,23 @@ A documentação da API fica em `/api/docs`.
 streamlit run app.py
 ```
 
+**Site estático** (o mesmo do GitHub Pages):
+```bash
+cd web && VITE_MODO=estatico npm run build && cd ..
+python tools/exportar_estatico.py web/dist/data
+python -m http.server 4173 --directory web/dist
+```
+
+**Gabaritos** (Python e navegador):
+```bash
+python tools/checar_gabarito.py
+cd web && node scripts/gabarito.ts
+```
+
 ## Deploy
-- **Streamlit Community Cloud** (em uso): o app publica o `app.py` direto da `main`. Como o Streamlit Cloud não roda `npm`, o build do componente fica versionado em `web/build`. Depois de mexer no frontend, rode `npm run build:streamlit` dentro de `web/` e commite o resultado.
-- **Docker / Render** (alternativa): o `Dockerfile` compila o frontend e sobe a API servindo tudo numa porta só (usa o `requirements-api.txt`, mais enxuto). O `render.yaml` descreve um web service gratuito no [Render](https://render.com): em *New → Blueprint*, aponte para este repositório.
+- **GitHub Pages** (principal): o `.github/workflows/pages.yml` publica sozinho a cada push na `main`. Ele roda o pipeline, os dois gabaritos, o build estático e a exportação dos dados.
+- **Streamlit Community Cloud**: publica o `app.py` direto da `main`. Como o Streamlit Cloud não roda `npm`, o build do componente fica versionado em `web/build`. Depois de mexer no frontend, rode `npm run build:streamlit` dentro de `web/` e commite o resultado.
+- **Docker / Render** (alternativa): o `Dockerfile` compila o frontend e sobe a API servindo tudo numa porta só (usa o `requirements-api.txt`, mais enxuto). O `render.yaml` descreve um web service gratuito no [Render](https://render.com).
 
 ## Licença
 MIT

@@ -1,0 +1,74 @@
+# Publica o site estático no GitHub Pages a cada push na main.
+# Antes de publicar, roda o pipeline Python e confere as duas extrações
+# (Python e navegador) contra o gabarito: se divergirem, não publica.
+name: GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Dependências Python
+        run: pip install -r requirements-api.txt
+
+      - name: Pipeline (PDFs -> SQLite)
+        run: python src/pipeline.py
+
+      - name: Gabarito da extração em Python
+        run: python tools/checar_gabarito.py
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Dependências do frontend
+        working-directory: web
+        run: npm ci
+
+      - name: Gabarito da extração no navegador (pdf.js)
+        working-directory: web
+        run: node scripts/gabarito.ts
+
+      - name: Build estático
+        working-directory: web
+        env:
+          VITE_MODO: estatico
+        run: npm run build
+
+      - name: Dados do site
+        run: python tools/exportar_estatico.py web/dist/data
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: web/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4

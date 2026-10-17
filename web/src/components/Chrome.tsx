@@ -6,7 +6,7 @@ import { useRef, useState } from 'react'
 import type { Carteira } from '../lib/api'
 import { dataCurta } from '../lib/format'
 import { MQ, ScrollTrigger, gsap, irPara, prefereMenosMovimento, useGSAP } from '../lib/motion'
-import { noStreamlit } from '../lib/streamlit'
+import { modo } from '../lib/modo'
 
 const SECOES = [
   ['resposta', 'Resposta'],
@@ -144,9 +144,9 @@ export function TelaErro({ mensagem, tentar }: { mensagem: string; tentar: () =>
   return (
     <main id="conteudo" className="error-screen">
       <Marca />
-      <h1>{noStreamlit ? 'Não consegui carregar a carteira.' : 'A API não respondeu.'}</h1>
+      <h1>{modo === 'api' ? 'A API não respondeu.' : 'Não consegui carregar a carteira.'}</h1>
       <p className="muted">{mensagem}</p>
-      {!noStreamlit && (
+      {modo === 'api' && (
         <>
           <p>Suba o backend na raiz do projeto e tente de novo:</p>
           <pre className="mono">
@@ -178,7 +178,7 @@ export function Rodape() {
           <a href="https://github.com/Educofseal/lease-lens" target="_blank" rel="noreferrer">
             Código no GitHub
           </a>
-          {!noStreamlit && (
+          {modo === 'api' && (
             <>
               <span className="muted"> · </span>
               <a href="/api/docs">Documentação da API</a>

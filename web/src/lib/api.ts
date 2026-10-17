@@ -1,6 +1,9 @@
 // Cliente da API FastAPI (api.py). Tipos espelham o JSON que ela devolve.
-// Dentro do Streamlit (app.py) os mesmos dados vêm pela ponte em streamlit.ts.
-import { argsDoStreamlit, noStreamlit, pedirExtracao } from './streamlit'
+// Dentro do Streamlit (app.py) os mesmos dados vêm pela ponte em streamlit.ts;
+// no site estático (GitHub Pages) vêm de data/carteira.json e o PDF é lido no navegador.
+import { argsDoStreamlit, pedirExtracao } from './streamlit'
+import { modo } from './modo'
+import { montarPainel, type ContratoBase } from './painel'
 
 export type Contrato = {
   arquivo: string
@@ -68,16 +71,52 @@ async function pedir<T>(url: string, init?: RequestInit): Promise<T> {
 
 const LIMITE_UPLOAD = 10 * 1024 * 1024
 
-export const buscarCarteira = () =>
-  noStreamlit ? argsDoStreamlit().then((a) => a.carteira!) : pedir<Carteira>('/api/carteira')
+// ── site estático ────────────────────────────────────────────────────────
+type DadosEstaticos = { exemplos: string[]; contratos: ContratoBase[] }
+let dadosEstaticos: Promise<DadosEstaticos> | null = null
+const dadosDoSite = () => (dadosEstaticos ??= pedir<DadosEstaticos>('./data/carteira.json'))
 
-export const listarExemplos = () =>
-  noStreamlit ? argsDoStreamlit().then((a) => a.exemplos ?? []) : pedir<string[]>('/api/exemplos')
+async function extrairNoNavegador(dados: ArrayBuffer, nome: string): Promise<Extracao> {
+  const cabecalho = new TextDecoder().decode(new Uint8Array(dados, 0, Math.min(4, dados.byteLength)))
+  if (cabecalho !== '%PDF') throw new Error('O arquivo enviado não é um PDF.')
+  const { textoDoPdf } = await import('./pdf')
+  const { extrairCampos } = await import('./campos')
+  let texto: string
+  try {
+    texto = await textoDoPdf(dados)
+  } catch {
+    throw new Error('Não consegui ler esse PDF.')
+  }
+  return { arquivo: nome, ...extrairCampos(texto) }
+}
 
-export const extrairExemplo = (arquivo: string) =>
-  noStreamlit
-    ? pedirExtracao({ tipo: 'exemplo', arquivo })
-    : pedir<Extracao>(`/api/exemplos/${encodeURIComponent(arquivo)}/extrair`, { method: 'POST' })
+async function extrairExemploNoNavegador(arquivo: string) {
+  const { exemplos } = await dadosDoSite()
+  // só aceita nomes da lista de exemplos (nada de ../)
+  if (!exemplos.includes(arquivo)) throw new Error('Contrato de exemplo não encontrado.')
+  const resposta = await fetch(`./data/contratos/${encodeURIComponent(arquivo)}`)
+  if (!resposta.ok) throw new Error('Contrato de exemplo não encontrado.')
+  return extrairNoNavegador(await resposta.arrayBuffer(), arquivo)
+}
+
+// ── interface comum aos três modos ───────────────────────────────────────
+export function buscarCarteira() {
+  if (modo === 'streamlit') return argsDoStreamlit().then((a) => a.carteira!)
+  if (modo === 'estatico') return dadosDoSite().then((d) => montarPainel(d.contratos))
+  return pedir<Carteira>('/api/carteira')
+}
+
+export function listarExemplos() {
+  if (modo === 'streamlit') return argsDoStreamlit().then((a) => a.exemplos ?? [])
+  if (modo === 'estatico') return dadosDoSite().then((d) => d.exemplos)
+  return pedir<string[]>('/api/exemplos')
+}
+
+export function extrairExemplo(arquivo: string) {
+  if (modo === 'streamlit') return pedirExtracao({ tipo: 'exemplo', arquivo })
+  if (modo === 'estatico') return extrairExemploNoNavegador(arquivo)
+  return pedir<Extracao>(`/api/exemplos/${encodeURIComponent(arquivo)}/extrair`, { method: 'POST' })
+}
 
 function emBase64(arquivo: File) {
   return new Promise<string>((ok, falha) => {
@@ -90,7 +129,8 @@ function emBase64(arquivo: File) {
 
 export async function extrairPdf(arquivo: File) {
   if (arquivo.size > LIMITE_UPLOAD) throw new Error('O PDF passa de 10 MB.')
-  if (noStreamlit) return pedirExtracao({ tipo: 'upload', arquivo: arquivo.name, b64: await emBase64(arquivo) })
+  if (modo === 'streamlit') return pedirExtracao({ tipo: 'upload', arquivo: arquivo.name, b64: await emBase64(arquivo) })
+  if (modo === 'estatico') return extrairNoNavegador(await arquivo.arrayBuffer(), arquivo.name)
   const corpo = new FormData()
   corpo.append('arquivo', arquivo)
   return pedir<Extracao>('/api/extrair', { method: 'POST', body: corpo })
