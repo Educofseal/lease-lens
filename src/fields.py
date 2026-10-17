@@ -17,7 +17,8 @@ def extrair_campos(texto):
     # cada campo: um padrao regex que descreve onde ele aparece no texto
     campos["locador"] = _buscar(r"instrumento,\s*(.+?),\s*LOCADOR", texto)
     campos["locatario"] = _buscar(r"e\s*(.+?),\s*LOCATARIO", texto)
-    campos["endereco"] = _buscar(r"IMOVEL:\s*(.+)", texto)
+    # ate o fim da linha, sem o ponto final da frase (o "Av." do meio fica)
+    campos["endereco"] = _buscar(r"(?m)IMOVEL:\s*(.+?)\.?\s*$", texto)
     campos["aluguel"] = _buscar(r"ALUGUEL:\s*R\$\s*([\d.]+)", texto)
     campos["vigencia_inicio"] = _buscar(r"VIGENCIA:\s*de\s*([\d/]+)", texto)
     campos["vigencia_fim"] = _buscar(r"a\s*([\d/]+)\.", texto)
