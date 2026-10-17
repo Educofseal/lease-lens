@@ -1,0 +1,7 @@
+.git
+.venv
+.claude
+**/__pycache__
+web/node_modules
+web/dist
+samples/expected

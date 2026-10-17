@@ -69,5 +69,8 @@ uvicorn api:app --port 8000            # abre em http://localhost:8000
 
 A documentação da API fica em `/api/docs`. A interface Streamlit antiga continua disponível com `streamlit run app.py`.
 
+## Deploy
+O `Dockerfile` compila o frontend e sobe a API servindo tudo numa porta só (usa o `requirements-api.txt`, mais enxuto). O `render.yaml` descreve um web service gratuito no [Render](https://render.com): em *New → Blueprint*, aponte para este repositório e cada push na `main` vira um deploy novo.
+
 ## Licença
 MIT

@@ -1,0 +1,10 @@
+# Blueprint do Render: um web service gratuito que builda o Dockerfile.
+# Cada push na main faz um novo deploy.
+services:
+  - type: web
+    name: lease-lens
+    runtime: docker
+    plan: free
+    branch: main
+    autoDeploy: true
+    healthCheckPath: /api/carteira
