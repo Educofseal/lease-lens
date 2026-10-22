@@ -1,4 +1,4 @@
-"""Interface publica do lease-lens no Streamlit (lease-lens.streamlit.app).
+"""Interface do lease-lens no Streamlit, para rodar local: `streamlit run app.py`.
 
 Embute o frontend React (web/build) como componente: os dados da carteira
 vao como argumento e a extracao dos PDFs roda aqui, em Python. Se o build

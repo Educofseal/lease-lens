@@ -30,7 +30,7 @@ PDF ─► extract.py ─► fields.py ─► store.py (SQLite) ─► query.py 
 A interface web (`web/`, React + Vite + GSAP) é a mesma em três lugares:
 - **GitHub Pages (site publicado):** estático e sempre no ar. A cada push, um GitHub Action roda o pipeline Python e exporta a carteira para JSON. As contas de vencimento rodam no navegador, na data de quem visita. O PDF enviado no laboratório é lido no próprio navegador ([pdf.js](https://mozilla.github.io/pdf.js/) + `web/src/lib/campos.ts`, espelho dos regex do `fields.py`) e não sai do computador.
 - **API (`api.py`, FastAPI):** a extração roda no Python do servidor.
-- **Streamlit (`app.py`, [lease-lens.streamlit.app](https://lease-lens.streamlit.app)):** o frontend roda como componente e o PDF volta para o Python. Sem o build em `web/build`, cai na interface Streamlit clássica.
+- **Streamlit (`app.py`, local):** o frontend roda como componente e o PDF volta para o Python. Sem o build em `web/build`, cai na interface Streamlit clássica.
 
 Como a extração existe em duas linguagens, o CI confere as duas contra o mesmo gabarito (`samples/expected`) antes de publicar: `tools/checar_gabarito.py` (Python) e `web/scripts/gabarito.ts` (navegador). Se uma divergir, o deploy não acontece.
 
@@ -76,10 +76,11 @@ uvicorn api:app --port 8000            # abre em http://localhost:8000
 
 A documentação da API fica em `/api/docs`.
 
-**Versão Streamlit** (a mesma do site publicado):
+**Versão Streamlit**:
 ```bash
 streamlit run app.py
 ```
+Ela usa o build do componente versionado em `web/build`. Depois de mexer no frontend, rode `npm run build:streamlit` dentro de `web/` e commite o resultado.
 
 **Site estático** (o mesmo do GitHub Pages):
 ```bash
@@ -96,7 +97,6 @@ cd web && node scripts/gabarito.ts
 
 ## Deploy
 - **GitHub Pages** (principal): o `.github/workflows/pages.yml` publica sozinho a cada push na `main`. Ele roda o pipeline, os dois gabaritos, o build estático e a exportação dos dados.
-- **Streamlit Community Cloud**: publica o `app.py` direto da `main`. Como o Streamlit Cloud não roda `npm`, o build do componente fica versionado em `web/build`. Depois de mexer no frontend, rode `npm run build:streamlit` dentro de `web/` e commite o resultado.
 - **Docker / Render** (alternativa): o `Dockerfile` compila o frontend e sobe a API servindo tudo numa porta só (usa o `requirements-api.txt`, mais enxuto). O `render.yaml` descreve um web service gratuito no [Render](https://render.com).
 
 ## Licença

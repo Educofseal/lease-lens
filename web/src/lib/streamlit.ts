@@ -1,5 +1,5 @@
 // Ponte com o Streamlit: quando a página roda como componente dentro do
-// app.py (lease-lens.streamlit.app), os dados chegam por postMessage e a
+// app.py (`streamlit run app.py`), os dados chegam por postMessage e a
 // extração roda no Python do Streamlit, não no FastAPI.
 import type { Carteira, Extracao } from './api'
 
